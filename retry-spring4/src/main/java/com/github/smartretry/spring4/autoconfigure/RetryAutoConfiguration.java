@@ -1,8 +1,10 @@
 package com.github.smartretry.spring4.autoconfigure;
 
+import com.github.smartretry.core.RetryRegistry;
 import com.github.smartretry.core.RetryTaskMapper;
 import com.github.smartretry.spring4.BeanConstants;
 import com.github.smartretry.spring4.JdbcRetryTaskMapper;
+import com.github.smartretry.spring4.QuartzRetryRegistry;
 import com.github.smartretry.spring4.RetryAnnotationBeanPostProcessor;
 import com.github.smartretry.spring4.aop.RetryHandlerClassInterceptor;
 import com.github.smartretry.spring4.aop.RetryHandlerClassPointcut;
@@ -31,6 +33,12 @@ public class RetryAutoConfiguration {
             dataSource = beanFactory.getBean(DataSource.class);
         }
         return new JdbcRetryTaskMapper(dataSource);
+    }
+
+    @Bean
+    @RetryConditional(missingBeanType = RetryRegistry.class)
+    public RetryRegistry retryRegistry() {
+        return new QuartzRetryRegistry();
     }
 
     @Bean

@@ -2,7 +2,7 @@ package com.github.smartretry.spring4.aop;
 
 import com.github.smartretry.core.RetryFunction;
 import com.github.smartretry.core.RetryHandler;
-import com.github.smartretry.core.registry.RetryHandlerRegistry;
+import com.github.smartretry.spring4.RetryHandlerRegistration;
 import com.github.smartretry.core.util.RetryHandlerUtils;
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
@@ -24,7 +24,7 @@ public class RetryHandlerMethodInterceptor implements MethodInterceptor {
         if (StringUtils.isBlank(identity)) {
             identity = RetryHandlerUtils.getMethodIdentity(invocation.getMethod());
         }
-        Optional<RetryHandler> optional = RetryHandlerRegistry.get(identity);
+        Optional<RetryHandler> optional = RetryHandlerRegistration.get(identity);
         if (optional.isPresent()) {
             return optional.get().handle(ArrayUtils.isEmpty(args) ? null : args[0]);
         }

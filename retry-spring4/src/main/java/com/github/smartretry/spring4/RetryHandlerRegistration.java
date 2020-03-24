@@ -1,4 +1,4 @@
-package com.github.smartretry.core.registry;
+package com.github.smartretry.spring4;
 
 import com.github.smartretry.core.RetryHandler;
 import com.github.smartretry.core.RetryHandlerPostProcessor;
@@ -10,7 +10,7 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * @author yuni[mn960mn@163.com]
  */
-public class RetryHandlerRegistry {
+public class RetryHandlerRegistration {
 
     private static final Map<String, RetryHandler> retryHandlerMap = new ConcurrentHashMap<>();
 
