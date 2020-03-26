@@ -1,6 +1,9 @@
 package com.github.smartretry.spring4;
 
 import com.github.smartretry.core.*;
+import com.github.smartretry.core.impl.DefaultRetryHandlerPostProcessor;
+import com.github.smartretry.core.impl.DefaultRetryProcessor;
+import com.github.smartretry.core.impl.DefaultRetryTaskFactory;
 import com.github.smartretry.core.impl.MethodRetryHandler;
 import com.github.smartretry.core.listener.RetryListener;
 import com.github.smartretry.core.util.RetryHandlerUtils;
@@ -10,12 +13,12 @@ import org.springframework.aop.framework.AopInfrastructureBean;
 import org.springframework.aop.framework.AopProxyUtils;
 import org.springframework.aop.support.AopUtils;
 import org.springframework.beans.BeansException;
-import org.springframework.beans.factory.BeanFactory;
-import org.springframework.beans.factory.BeanFactoryAware;
-import org.springframework.beans.factory.SmartInitializingSingleton;
+import org.springframework.beans.factory.*;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
+import org.springframework.context.EnvironmentAware;
 import org.springframework.core.MethodIntrospector;
+import org.springframework.core.env.Environment;
 import org.springframework.util.ReflectionUtils;
 
 import java.lang.reflect.Method;
@@ -24,22 +27,51 @@ import java.util.Set;
 import java.util.function.Supplier;
 
 /**
- * 对所有com.github.smartretry.core.RetryHandler和带有@RetryFunction注解的方法注册为Quartz Job
+ * 对所有com.github.smartretry.core.RetryHandler和带有@RetryFunction注解的方法进行注册
  *
  * @author yuni[mn960mn@163.com]
  */
 @Slf4j
-public class RetryAnnotationBeanPostProcessor implements BeanPostProcessor, SmartInitializingSingleton, BeanFactoryAware {
+public class RetryAnnotationBeanPostProcessor implements BeanPostProcessor, SmartInitializingSingleton, EnvironmentAware, InitializingBean, BeanFactoryAware {
 
     private DefaultListableBeanFactory defaultListableBeanFactory;
+
+    private Environment environment;
 
     private Set<Class<?>> nonAnnotatedClasses = new HashSet<>();
 
     private RetryRegistry retryRegistry;
 
+    private Boolean beforeTask;
+
+    private RetrySerializer retrySerializer;
+
+    private RetryTaskMapper retryTaskMapper;
+
+    private RetryHandlerPostProcessor<Object, Object> retryHandlerPostProcessor;
+
     @Override
     public void setBeanFactory(BeanFactory beanFactory) throws BeansException {
-        retryRegistry = beanFactory.getBean(RetryRegistry.class);
+        defaultListableBeanFactory = (DefaultListableBeanFactory) beanFactory;
+    }
+
+    @Override
+    public void setEnvironment(Environment environment) {
+        this.environment = environment;
+    }
+
+    @Override
+    public void afterPropertiesSet() {
+        this.retryRegistry = defaultListableBeanFactory.getBean(RetryRegistry.class);
+        this.beforeTask = environment.getProperty(EnvironmentConstants.RETRY_BEFORETASK, Boolean.class, Boolean.TRUE);
+        this.retryTaskMapper = defaultListableBeanFactory.getBean(RetryTaskMapper.class);
+
+        this.retrySerializer = getRetrySerializerFromBeanFactory(defaultListableBeanFactory);
+        if (this.retrySerializer == null) {
+            this.retryHandlerPostProcessor = new DefaultRetryHandlerPostProcessor(retryTaskMapper, beforeTask);
+        } else {
+            this.retryHandlerPostProcessor = new DefaultRetryHandlerPostProcessor(new DefaultRetryTaskFactory(retrySerializer), retryTaskMapper, beforeTask);
+        }
     }
 
     @Override
@@ -87,8 +119,25 @@ public class RetryAnnotationBeanPostProcessor implements BeanPostProcessor, Smar
         registerJobBean(new MethodRetryHandler(bean, invocableMethod, retryFunction, retryListenerSupplier));
     }
 
-    private void registerJobBean(RetryHandler retryHandler) {
-        retryRegistry.register(retryHandler);
+    private RetrySerializer getRetrySerializerFromBeanFactory(BeanFactory beanFactory) {
+        try {
+            return beanFactory.getBean(RetrySerializer.class);
+        } catch (NoSuchBeanDefinitionException e) {
+            return null;
+        }
+    }
+
+    protected void registerJobBean(RetryHandler retryHandler) {
+        if (retryHandler.identity().length() > 50) {
+            throw new IllegalArgumentException("identity=" + retryHandler.identity() + " is too long, it must be less than 50");
+        }
+
+        RetryHandler retryHandlerProxy = retryHandlerPostProcessor.doPost(retryHandler);
+        RetryHandlerRegistration.registry(retryHandlerProxy);
+
+        RetryProcessor retryProcessor = new DefaultRetryProcessor(retryHandler, retryTaskMapper, retrySerializer);
+
+        retryRegistry.register(retryHandler, retryProcessor);
     }
 
     @Override

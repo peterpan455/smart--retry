@@ -6,5 +6,5 @@ package com.github.smartretry.core;
 @FunctionalInterface
 public interface RetryRegistry {
 
-    void register(RetryHandler retryHandler);
+    void register(RetryHandler retryHandler, RetryProcessor retryProcessor);
 }

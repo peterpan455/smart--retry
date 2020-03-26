@@ -4,7 +4,7 @@ import com.github.smartretry.core.RetryRegistry;
 import com.github.smartretry.core.RetryTaskMapper;
 import com.github.smartretry.spring4.BeanConstants;
 import com.github.smartretry.spring4.JdbcRetryTaskMapper;
-import com.github.smartretry.spring4.QuartzRetryRegistry;
+import com.github.smartretry.spring4.registry.quartz.QuartzRetryRegistry;
 import com.github.smartretry.spring4.RetryAnnotationBeanPostProcessor;
 import com.github.smartretry.spring4.aop.RetryHandlerClassInterceptor;
 import com.github.smartretry.spring4.aop.RetryHandlerClassPointcut;

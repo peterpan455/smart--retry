@@ -5,5 +5,8 @@ package com.github.smartretry.core;
  */
 public interface RetryProcessor {
 
+    /**
+     * 执行定时重试
+     */
     void doRetry();
 }
