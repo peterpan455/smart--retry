@@ -1,8 +1,7 @@
-package com.github.smartretry.spring4.admin;
+package com.github.smartretry.spring4.registry.quartz.web;
 
-import com.github.smartretry.spring4.RetrySchedulerFactoryBean;
-import com.github.smartretry.spring4.admin.model.JobDetail;
-import com.github.smartretry.spring4.admin.model.JobStatusEnum;
+import com.github.smartretry.spring4.registry.quartz.JobStatusEnum;
+import com.github.smartretry.spring4.registry.quartz.RetrySchedulerFactoryBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -21,11 +20,12 @@ import java.util.stream.Collectors;
  * job管理
  *
  * @author yuni[mn960mn@163.com]
- *
  * @see RetrySchedulerFactoryBean
  */
 @RequestMapping("/job")
 public class AdminController {
+
+    public static final String RESPONSE = "success";
 
     @Autowired
     private ApplicationContext applicationContext;
@@ -59,7 +59,7 @@ public class AdminController {
         Optional<RetrySchedulerFactoryBean> optional = applicationContext.getBeansOfType(RetrySchedulerFactoryBean.class).values()
                 .stream().filter(job -> job.getJobIdentity().equals(identity)).filter(job -> job.getJobStatusEnum() != JobStatusEnum.RUNNING).findAny();
         optional.ifPresent(RetrySchedulerFactoryBean::startNow);
-        return "success";
+        return RESPONSE;
     }
 
     @ResponseBody
@@ -68,7 +68,7 @@ public class AdminController {
         Optional<RetrySchedulerFactoryBean> optional = applicationContext.getBeansOfType(RetrySchedulerFactoryBean.class).values()
                 .stream().filter(job -> job.getJobIdentity().equals(identity)).filter(job -> job.getJobStatusEnum() == JobStatusEnum.RUNNING).findAny();
         optional.ifPresent(RetrySchedulerFactoryBean::stop);
-        return "success";
+        return RESPONSE;
     }
 
     @ResponseBody
@@ -77,6 +77,6 @@ public class AdminController {
         Optional<RetrySchedulerFactoryBean> optional = applicationContext.getBeansOfType(RetrySchedulerFactoryBean.class).values()
                 .stream().filter(job -> job.getJobIdentity().equals(identity)).filter(job -> job.getJobStatusEnum() == JobStatusEnum.RUNNING).findAny();
         optional.ifPresent(RetrySchedulerFactoryBean::runAsync);
-        return "success";
+        return RESPONSE;
     }
 }

@@ -25,6 +25,8 @@ public interface RetryHandler<T, R> {
 
     boolean DEFAULT_IGNOREEXCEPTION = true;
 
+    boolean DEFAULT_AUTO_STARTUP = true;
+
     /**
      * 任务名称
      *
@@ -105,5 +107,14 @@ public interface RetryHandler<T, R> {
      */
     default boolean ignoreException() {
         return DEFAULT_IGNOREEXCEPTION;
+    }
+
+    /**
+     * 定时重试是否自动启动
+     *
+     * @return
+     */
+    default boolean autoStartup() {
+        return DEFAULT_AUTO_STARTUP;
     }
 }

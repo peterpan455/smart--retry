@@ -19,6 +19,8 @@ import java.lang.annotation.Target;
 @Conditional(RetryConfigurationCondition.class)
 public @interface RetryConditional {
 
-    Class<?> missingBeanType();
+    Class<?> missingBeanType() default Void.class;
+
+    Class<?> hasBeanType() default Void.class;
 
 }

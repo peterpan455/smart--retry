@@ -4,8 +4,6 @@
 |:-----|:----|:----:|:----:|:----|:----|
 | retry.enabled |boolean| true、false | true | 是否开启任务重试 |  |
 | retry.web.enabled |boolean| true、false | true | 是否开启Job管理功能 |  |
-| retry.job.autoStartup |boolean| true、false | true | 重试Job是否自动启动 | 配置false，可通过Job管理功能手工启动。<font color=red>如果系统是集群部署，有多个节点。强烈建议只在一个节点上启动Job，其他节点不要启动，避免重复执行</font> |
-| retry.job.startupDelay |number| 0-~ | 30(秒) | 延迟多少秒启动重试Job | 0为立即启动 |
 | retry.beforeTask | boolean | true、false | true | 是否在执行任务之前插入数据库 |配置false则表示，只有任务执行报错才插入数据库|
 | retry.sqlMapping.filepath | string |  |  | 配置自定义SQL文件 |当前系统只支持sqlserver、mysql、PostgreSQL，如果不是使用这些数据库，则需要自己扩展|
 

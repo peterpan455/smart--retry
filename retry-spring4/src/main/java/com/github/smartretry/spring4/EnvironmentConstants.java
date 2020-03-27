@@ -14,8 +14,4 @@ public class EnvironmentConstants {
     public static final String RETRY_SQLMAPPING_FILEPATH_KEY = "retry.sqlMapping.filepath";
 
     public static final String RETRY_BEFORETASK = "retry.beforeTask";
-
-    public static final String RETRY_JOB_AUTOSTARTUP = "retry.job.autoStartup";
-
-    public static final String RETRY_JOB_STARTUPDELAY = "retry.job.startupDelay";
 }
