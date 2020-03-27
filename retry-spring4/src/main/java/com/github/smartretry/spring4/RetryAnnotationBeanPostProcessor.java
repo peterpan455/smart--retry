@@ -66,7 +66,7 @@ public class RetryAnnotationBeanPostProcessor implements BeanPostProcessor, Smar
         this.retryTaskMapper = defaultListableBeanFactory.getBean(RetryTaskMapper.class);
         this.retryRegistry = defaultListableBeanFactory.getBean(RetryRegistry.class);
 
-        boolean beforeTask = environment.getProperty(EnvironmentConstants.RETRY_BEFORETASK, Boolean.class, Boolean.TRUE);
+        boolean beforeTask = environment.getProperty(EnvironmentConstants.RETRY_BEFORETASK, Boolean.class, true);
         this.retrySerializer = getRetrySerializerFromBeanFactory(defaultListableBeanFactory);
         if (this.retrySerializer == null) {
             this.retryHandlerPostProcessor = new DefaultRetryHandlerPostProcessor(retryTaskMapper, beforeTask);
