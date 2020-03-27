@@ -1,6 +1,5 @@
-package com.github.smartretry.spring4;
+package com.github.smartretry.spring4.registry.quartz;
 
-import com.github.smartretry.spring4.admin.model.JobStatusEnum;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;

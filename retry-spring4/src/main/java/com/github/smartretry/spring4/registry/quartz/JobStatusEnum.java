@@ -1,7 +1,9 @@
-package com.github.smartretry.spring4.admin.model;
+package com.github.smartretry.spring4.registry.quartz;
 
 /**
  * job状态枚举
+ *
+ * @see RetrySchedulerFactoryBean
  *
  * @author yuni[mn960mn@163.com]
  */

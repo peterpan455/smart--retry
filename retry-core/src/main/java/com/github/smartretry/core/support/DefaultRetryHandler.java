@@ -98,4 +98,9 @@ public class DefaultRetryHandler implements GenericRetryHandler {
     public boolean ignoreException() {
         return delegate.ignoreException();
     }
+
+    @Override
+    public boolean autoStartup() {
+        return delegate.autoStartup();
+    }
 }

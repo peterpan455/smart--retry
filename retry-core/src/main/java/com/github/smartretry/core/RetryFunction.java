@@ -8,7 +8,7 @@ import java.lang.annotation.Target;
 
 /**
  * 打上 RetryFunction 注解的方法，会被系统代理，一旦方法执行报错，将会定时重试
- *
+ * <p>
  * 打上 RetryFunction 注解的方法，需要注意
  * 1：方法必须要有参数，且只能有一个参数
  * 2：方法可以有返回参数，也可以没有
@@ -83,4 +83,11 @@ public @interface RetryFunction {
      * @return
      */
     int initialDelay() default RetryHandler.DEFAULT_INITIALDELAY;
+
+    /**
+     * 定时重试是否自动启动
+     *
+     * @return
+     */
+    boolean autoStartup() default RetryHandler.DEFAULT_AUTO_STARTUP;
 }

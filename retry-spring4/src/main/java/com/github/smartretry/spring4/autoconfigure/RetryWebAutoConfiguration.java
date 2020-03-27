@@ -1,6 +1,6 @@
 package com.github.smartretry.spring4.autoconfigure;
 
-import com.github.smartretry.spring4.admin.AdminController;
+import com.github.smartretry.spring4.registry.quartz.web.AdminController;
 import org.springframework.context.annotation.Bean;
 
 /**

@@ -83,6 +83,11 @@ public class MethodRetryHandler implements GenericRetryHandler {
     }
 
     @Override
+    public boolean autoStartup() {
+        return retryed.autoStartup();
+    }
+
+    @Override
     public Class<?> getInputArgsType() {
         return method.getParameterCount() == 1 ? method.getParameterTypes()[0] : null;
     }

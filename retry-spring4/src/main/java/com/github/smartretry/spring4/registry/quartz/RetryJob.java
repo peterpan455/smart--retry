@@ -1,4 +1,4 @@
-package com.github.smartretry.spring4.job;
+package com.github.smartretry.spring4.registry.quartz;
 
 import com.github.smartretry.core.RetryProcessor;
 import org.quartz.Job;

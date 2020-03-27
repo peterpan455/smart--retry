@@ -1,11 +1,7 @@
 package com.github.smartretry.spring4.registry.quartz;
 
 import com.github.smartretry.core.*;
-import com.github.smartretry.core.impl.DefaultRetryProcessor;
 import com.github.smartretry.spring4.*;
-import com.github.smartretry.spring4.admin.model.JobStatusEnum;
-import com.github.smartretry.spring4.job.RetryJob;
-import com.github.smartretry.spring4.job.RetryJobFactory;
 import org.apache.commons.lang3.StringUtils;
 import org.quartz.JobDataMap;
 import org.quartz.spi.JobFactory;
@@ -33,22 +29,19 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public class QuartzRetryRegistry implements RetryRegistry, BeanFactoryAware, EnvironmentAware, InitializingBean, DisposableBean {
 
+    public static final String RETRY_JOB_STARTUPDELAY = "retry.job.startupDelay";
+
     private DefaultListableBeanFactory defaultListableBeanFactory;
 
     private Environment environment;
 
-    private Executor taskExecutor = Executors.newCachedThreadPool();
+    private Executor taskExecutor;
 
     private List<RetryBeanDefinitionBuilderCustomizer> retryBeanDefinitionBuilderCustomizers;
 
     private AtomicInteger jobNameIndex = new AtomicInteger(0);
 
     private JobFactory jobFactory = new RetryJobFactory();
-
-    /**
-     * job是否自动启动。如果配置的是false，就需要手工启动
-     */
-    private boolean jobAutoStartup;
 
     /**
      * 延迟多少秒之后，再启动job
@@ -67,14 +60,15 @@ public class QuartzRetryRegistry implements RetryRegistry, BeanFactoryAware, Env
 
     @Override
     public void afterPropertiesSet() {
-        this.jobAutoStartup = environment.getProperty(EnvironmentConstants.RETRY_JOB_AUTOSTARTUP, Boolean.class, Boolean.TRUE);
-        this.jobStartupDelay = environment.getProperty(EnvironmentConstants.RETRY_JOB_STARTUPDELAY, Integer.class, 30);
+        this.jobStartupDelay = environment.getProperty(RETRY_JOB_STARTUPDELAY, Integer.class, 30);
 
         this.retryBeanDefinitionBuilderCustomizers = new ArrayList<>(defaultListableBeanFactory.getBeansOfType(RetryBeanDefinitionBuilderCustomizer.class).values());
         this.retryBeanDefinitionBuilderCustomizers.sort(OrderComparator.INSTANCE);
 
         if (defaultListableBeanFactory.containsBean(BeanConstants.DEFAULT_RETRY_TASKEXECUTOR)) {
             this.taskExecutor = defaultListableBeanFactory.getBean(BeanConstants.DEFAULT_RETRY_TASKEXECUTOR, Executor.class);
+        } else {
+            this.taskExecutor = Executors.newCachedThreadPool();
         }
     }
 
@@ -133,14 +127,14 @@ public class QuartzRetryRegistry implements RetryRegistry, BeanFactoryAware, Env
         BeanDefinitionBuilder beanDefinitionBuilder = BeanDefinitionBuilder.rootBeanDefinition(RetrySchedulerFactoryBean.class);
         beanDefinitionBuilder.addPropertyValue("taskExecutor", taskExecutor);
         beanDefinitionBuilder.addPropertyValue("triggers", jobTrigger);
-        beanDefinitionBuilder.addPropertyValue("autoStartup", jobAutoStartup);
+        beanDefinitionBuilder.addPropertyValue("autoStartup", retryHandler.autoStartup());
         beanDefinitionBuilder.addPropertyValue("startupDelay", jobStartupDelay);
         beanDefinitionBuilder.addPropertyValue("jobFactory", jobFactory);
         beanDefinitionBuilder.addPropertyValue("jobGroup", group);
         beanDefinitionBuilder.addPropertyValue("jobName", retryHandler.name());
         beanDefinitionBuilder.addPropertyValue("jobIdentity", retryHandler.identity());
         beanDefinitionBuilder.addPropertyValue("jobPeriod", jobPeriod);
-        if (!jobAutoStartup) {
+        if (!retryHandler.autoStartup()) {
             beanDefinitionBuilder.addPropertyValue("jobStatusEnum", JobStatusEnum.PREPARE);
         }
 

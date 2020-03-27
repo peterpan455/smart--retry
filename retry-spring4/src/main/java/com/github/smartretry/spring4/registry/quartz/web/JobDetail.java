@@ -1,4 +1,4 @@
-package com.github.smartretry.spring4.admin.model;
+package com.github.smartretry.spring4.registry.quartz.web;
 
 import lombok.Getter;
 import lombok.Setter;

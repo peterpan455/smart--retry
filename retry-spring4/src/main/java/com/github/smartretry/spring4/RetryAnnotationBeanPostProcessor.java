@@ -38,11 +38,12 @@ public class RetryAnnotationBeanPostProcessor implements BeanPostProcessor, Smar
 
     private Environment environment;
 
-    private Set<Class<?>> nonAnnotatedClasses = new HashSet<>();
+    /**
+     * 同一个类，如何在Spring容器中有多个，则会PostProcessor多次，这个Set就是为了防止多次注册的
+     */
+    private Set<Class<?>> postedClasseCache = new HashSet<>();
 
     private RetryRegistry retryRegistry;
-
-    private Boolean beforeTask;
 
     private RetrySerializer retrySerializer;
 
@@ -62,10 +63,10 @@ public class RetryAnnotationBeanPostProcessor implements BeanPostProcessor, Smar
 
     @Override
     public void afterPropertiesSet() {
-        this.retryRegistry = defaultListableBeanFactory.getBean(RetryRegistry.class);
-        this.beforeTask = environment.getProperty(EnvironmentConstants.RETRY_BEFORETASK, Boolean.class, Boolean.TRUE);
         this.retryTaskMapper = defaultListableBeanFactory.getBean(RetryTaskMapper.class);
+        this.retryRegistry = defaultListableBeanFactory.getBean(RetryRegistry.class);
 
+        boolean beforeTask = environment.getProperty(EnvironmentConstants.RETRY_BEFORETASK, Boolean.class, Boolean.TRUE);
         this.retrySerializer = getRetrySerializerFromBeanFactory(defaultListableBeanFactory);
         if (this.retrySerializer == null) {
             this.retryHandlerPostProcessor = new DefaultRetryHandlerPostProcessor(retryTaskMapper, beforeTask);
@@ -87,7 +88,7 @@ public class RetryAnnotationBeanPostProcessor implements BeanPostProcessor, Smar
         }
 
         Class<?> targetClass = AopProxyUtils.ultimateTargetClass(bean);
-        if (!this.nonAnnotatedClasses.contains(targetClass)) {
+        if (!this.postedClasseCache.contains(targetClass)) {
             Object targetObject = AopProxyUtils.getSingletonTarget(bean);
             if (RetryHandler.class.isAssignableFrom(targetClass)) {
                 RetryHandlerUtils.validateRetryHandler(targetClass);
@@ -98,6 +99,8 @@ public class RetryAnnotationBeanPostProcessor implements BeanPostProcessor, Smar
             ReflectionUtils.MethodFilter methodFilter = method -> method.getAnnotation(RetryFunction.class) != null;
             Set<Method> methods = MethodIntrospector.selectMethods(targetClass, methodFilter);
             methods.forEach(method -> processRetryFunction(targetObject, method));
+
+            postedClasseCache.add(targetClass);
         }
         return bean;
     }
@@ -142,6 +145,6 @@ public class RetryAnnotationBeanPostProcessor implements BeanPostProcessor, Smar
 
     @Override
     public void afterSingletonsInstantiated() {
-        nonAnnotatedClasses.clear();
+        postedClasseCache.clear();
     }
 }

@@ -37,7 +37,7 @@ public class RetryAutoConfiguration {
 
     @Bean
     @RetryConditional(missingBeanType = RetryRegistry.class)
-    public RetryRegistry retryRegistry() {
+    public RetryRegistry defaultRetryRegistry() {
         return new QuartzRetryRegistry();
     }
 
