@@ -72,7 +72,7 @@ public class OrderBusiness extends JdbcTemplate {
         log.info("order[{}]已更新为失败", order.getOrderId());
     }
 
-    @RetryFunction(name = "RetryFunction重试-创建订单", identity = "demo.create.order", retryListener = "orderRetryListener", maxRetryCount = 6)
+    @RetryFunction(name = "RetryFunction重试-创建订单", identity = "demo.create.order", cron = "0 2/6 * * * ? *", retryListener = "orderRetryListener", maxRetryCount = 6)
     public void payOrderAndUpdateStatus(Order order) {
         ratioWith40.doAction();
         updateOrderPayStatus(order);

@@ -39,6 +39,11 @@ public class OrderPaymentBusiness implements RetryHandler<Order, Long> {
     }
 
     @Override
+    public String cron() {
+        return "0 1/6 * * * ? *";
+    }
+
+    @Override
     public RetryListener retryListener() {
         return new RetryListener() {
             @Override

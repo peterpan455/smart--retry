@@ -1,17 +1,17 @@
 package com.github.smartretry.spring4.registry.quartz;
 
-import com.github.smartretry.core.*;
-import com.github.smartretry.spring4.*;
+import com.github.smartretry.core.RetryHandler;
+import com.github.smartretry.core.RetryProcessor;
+import com.github.smartretry.spring4.BeanConstants;
+import com.github.smartretry.spring4.JobConstant;
+import com.github.smartretry.spring4.registry.AbstractRetryRegistry;
 import org.apache.commons.lang3.StringUtils;
 import org.quartz.JobDataMap;
 import org.quartz.spi.JobFactory;
-import org.springframework.beans.BeansException;
-import org.springframework.beans.factory.*;
+import org.springframework.beans.factory.DisposableBean;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
-import org.springframework.beans.factory.support.DefaultListableBeanFactory;
-import org.springframework.context.EnvironmentAware;
 import org.springframework.core.OrderComparator;
-import org.springframework.core.env.Environment;
 import org.springframework.scheduling.quartz.CronTriggerFactoryBean;
 import org.springframework.scheduling.quartz.JobDetailFactoryBean;
 import org.springframework.scheduling.quartz.SimpleTriggerFactoryBean;
@@ -27,13 +27,9 @@ import java.util.concurrent.atomic.AtomicInteger;
 /**
  * 把重试任务注册到quartz中
  */
-public class QuartzRetryRegistry implements RetryRegistry, BeanFactoryAware, EnvironmentAware, InitializingBean, DisposableBean {
+public class QuartzRetryRegistry extends AbstractRetryRegistry implements InitializingBean, DisposableBean {
 
     public static final String RETRY_JOB_STARTUPDELAY = "retry.job.startupDelay";
-
-    private DefaultListableBeanFactory defaultListableBeanFactory;
-
-    private Environment environment;
 
     private Executor taskExecutor;
 
@@ -47,16 +43,6 @@ public class QuartzRetryRegistry implements RetryRegistry, BeanFactoryAware, Env
      * 延迟多少秒之后，再启动job
      */
     private int jobStartupDelay;
-
-    @Override
-    public void setEnvironment(Environment environment) {
-        this.environment = environment;
-    }
-
-    @Override
-    public void setBeanFactory(BeanFactory beanFactory) throws BeansException {
-        this.defaultListableBeanFactory = (DefaultListableBeanFactory) beanFactory;
-    }
 
     @Override
     public void afterPropertiesSet() {
@@ -142,7 +128,7 @@ public class QuartzRetryRegistry implements RetryRegistry, BeanFactoryAware, Env
         retryBeanDefinitionBuilderCustomizers.forEach(c -> c.customize(retryHandler.identity(), beanDefinitionBuilder));
 
         // 注册Bean
-        String jobBeanName = "JOB." + index + "." + retryHandler.identity();
+        String jobBeanName = "job." + retryHandler.identity() + "." + index;
         defaultListableBeanFactory.registerBeanDefinition(jobBeanName, beanDefinitionBuilder.getBeanDefinition());
     }
 
