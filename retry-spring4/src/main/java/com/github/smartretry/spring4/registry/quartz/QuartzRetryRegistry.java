@@ -5,6 +5,7 @@ import com.github.smartretry.core.RetryProcessor;
 import com.github.smartretry.spring4.BeanConstants;
 import com.github.smartretry.spring4.JobConstant;
 import com.github.smartretry.spring4.registry.AbstractRetryRegistry;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.quartz.JobDataMap;
 import org.quartz.spi.JobFactory;
@@ -26,7 +27,10 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * 把重试任务注册到quartz中
+ *
+ * @author yuni[mn960mn@163.com]
  */
+@Slf4j
 public class QuartzRetryRegistry extends AbstractRetryRegistry implements InitializingBean, DisposableBean {
 
     public static final String RETRY_JOB_STARTUPDELAY = "retry.job.startupDelay";
@@ -130,6 +134,7 @@ public class QuartzRetryRegistry extends AbstractRetryRegistry implements Initia
         // 注册Bean
         String jobBeanName = "job." + retryHandler.identity() + "." + index;
         defaultListableBeanFactory.registerBeanDefinition(jobBeanName, beanDefinitionBuilder.getBeanDefinition());
+        log.info("identity={}已成功注册到Quartz", retryHandler.identity());
     }
 
     @Override

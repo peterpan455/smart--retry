@@ -11,6 +11,7 @@ import com.github.smartretry.core.RetryHandler;
 import com.github.smartretry.core.RetryProcessor;
 import com.github.smartretry.spring4.registry.AbstractRetryRegistry;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.beans.factory.NoUniqueBeanDefinitionException;
@@ -18,6 +19,12 @@ import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
+/**
+ * 把重试任务注册到Elastic-Job
+ *
+ * @author yuni[mn960mn@163.com]
+ * @since 1.3.5
+ */
 @Slf4j
 public class ElasticJobRegistry extends AbstractRetryRegistry implements InitializingBean {
 
@@ -32,7 +39,7 @@ public class ElasticJobRegistry extends AbstractRetryRegistry implements Initial
 
     protected AtomicInteger jobBeanNameIndex = new AtomicInteger(0);
 
-    private ElasticJobListener[] elasticJobListeners = new ElasticJobListener[0];
+    protected ElasticJobListener[] elasticJobListeners = new ElasticJobListener[0];
 
     @Override
     public void afterPropertiesSet() {
@@ -49,6 +56,9 @@ public class ElasticJobRegistry extends AbstractRetryRegistry implements Initial
 
     @Override
     public void register(RetryHandler retryHandler, RetryProcessor retryProcessor) {
+        if (StringUtils.isBlank(retryHandler.cron())) {
+            throw new IllegalArgumentException("identity=" + retryHandler.identity() + ", 使用Elastic-Job注册器，必须指定RetryHandler/RetryFunction的cron表达式");
+        }
         BeanDefinitionBuilder beanDefinitionBuilder = BeanDefinitionBuilder.rootBeanDefinition(SpringJobScheduler.class);
         beanDefinitionBuilder.addConstructorArgValue(new RetryJob(retryProcessor));
         beanDefinitionBuilder.addConstructorArgValue(registryCenter);
@@ -56,7 +66,7 @@ public class ElasticJobRegistry extends AbstractRetryRegistry implements Initial
         if (jobEventConfiguration != null) {
             beanDefinitionBuilder.addConstructorArgValue(jobEventConfiguration);
         }
-        beanDefinitionBuilder.addConstructorArgValue(elasticJobListeners);
+        beanDefinitionBuilder.addConstructorArgValue(getElasticJobListeners());
         beanDefinitionBuilder.setInitMethodName("init");
 
         String jobBeanName = getJobBeanName(retryHandler);
@@ -78,5 +88,9 @@ public class ElasticJobRegistry extends AbstractRetryRegistry implements Initial
 
     protected String getJobBeanName(RetryHandler retryHandler) {
         return "job." + retryHandler.identity() + "." + jobBeanNameIndex.incrementAndGet();
+    }
+
+    protected ElasticJobListener[] getElasticJobListeners() {
+        return this.elasticJobListeners;
     }
 }

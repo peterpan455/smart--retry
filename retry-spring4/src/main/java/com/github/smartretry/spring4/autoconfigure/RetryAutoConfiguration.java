@@ -1,8 +1,5 @@
 package com.github.smartretry.spring4.autoconfigure;
 
-import com.dangdang.ddframe.job.reg.base.CoordinatorRegistryCenter;
-import com.dangdang.ddframe.job.reg.zookeeper.ZookeeperConfiguration;
-import com.dangdang.ddframe.job.reg.zookeeper.ZookeeperRegistryCenter;
 import com.github.smartretry.core.RetryRegistry;
 import com.github.smartretry.core.RetryTaskMapper;
 import com.github.smartretry.spring4.BeanConstants;
@@ -12,7 +9,6 @@ import com.github.smartretry.spring4.aop.RetryHandlerClassInterceptor;
 import com.github.smartretry.spring4.aop.RetryHandlerClassPointcut;
 import com.github.smartretry.spring4.aop.RetryHandlerMethodInterceptor;
 import com.github.smartretry.spring4.aop.RetryHandlerMethodPointcut;
-import com.github.smartretry.spring4.registry.elasticjob.ElasticJobRegistry;
 import com.github.smartretry.spring4.registry.quartz.QuartzRetryRegistry;
 import com.github.smartretry.spring4.support.RetryConditional;
 import org.springframework.aop.support.DefaultPointcutAdvisor;
@@ -39,20 +35,10 @@ public class RetryAutoConfiguration {
         return new JdbcRetryTaskMapper(dataSource);
     }
 
-    //    @Bean
-//    @RetryConditional(missingBeanType = RetryRegistry.class)
-    public RetryRegistry defaultRetryRegistry() {
-        return new QuartzRetryRegistry();
-    }
-
-    @Bean(initMethod = "init")
-    public CoordinatorRegistryCenter coordinatorRegistryCenter() {
-        return new ZookeeperRegistryCenter(new ZookeeperConfiguration("192.168.105.90:2181", "p6"));
-    }
-
     @Bean
-    public RetryRegistry elasticJobRegistry() {
-        return new ElasticJobRegistry();
+    @RetryConditional(missingBeanType = RetryRegistry.class)
+    public QuartzRetryRegistry defaultRetryRegistry() {
+        return new QuartzRetryRegistry();
     }
 
     @Bean
