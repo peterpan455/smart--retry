@@ -1,6 +1,5 @@
 package com.github.smartretry.spring4.registry.quartz;
 
-import com.github.smartretry.spring4.JobConstant;
 import org.quartz.Job;
 import org.quartz.Scheduler;
 import org.quartz.spi.JobFactory;

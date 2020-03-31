@@ -3,7 +3,6 @@ package com.github.smartretry.spring4.registry.quartz;
 import com.github.smartretry.core.RetryHandler;
 import com.github.smartretry.core.RetryProcessor;
 import com.github.smartretry.spring4.BeanConstants;
-import com.github.smartretry.spring4.JobConstant;
 import com.github.smartretry.spring4.registry.AbstractRetryRegistry;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;

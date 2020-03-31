@@ -26,7 +26,7 @@ public class DefaultRetryProcessor implements RetryProcessor {
 
     public DefaultRetryProcessor(RetryHandler<Object, Object> retryHandler, RetryTaskMapper retryTaskMapper, RetrySerializer retrySerializer) {
         if (retryHandler instanceof GenericRetryHandler) {
-            genericRetryHandler = (GenericRetryHandler) retryHandler;
+            this.genericRetryHandler = (GenericRetryHandler) retryHandler;
         } else {
             this.genericRetryHandler = new DefaultRetryHandler(retryHandler);
         }

@@ -48,8 +48,9 @@ public class JdbcRetryTaskMapper extends JdbcTemplate implements RetryTaskMapper
         this.environment = environment;
     }
 
-    @PostConstruct
-    public void initSqlMappingProperties() {
+    @Override
+    public void afterPropertiesSet() {
+        super.afterPropertiesSet();
         this.sqlMappingProperties = getSqlMappingProperties();
         this.primaryKeyKey = sqlMappingProperties.getProperty(PRIMARY_KEY_KEY);
     }

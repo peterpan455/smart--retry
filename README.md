@@ -17,6 +17,7 @@ Smart Retry主要是用来进行方法重试的。和Guava Retry、Spring Retry�
 * 异步重试（不支持同步重试）
 * 支持接口实现和声明式方式
 * 大量的扩展点
+* 支持对接其他调度框架（Elastic-Job）
 * 提供重试Job可视化管理
 
 ## 适用场景
@@ -45,8 +46,9 @@ Smart Retry主要是用来进行方法重试的。和Guava Retry、Spring Retry�
 * PostgreSQL
 * MSSQL Server
 * Jackson 2.x
-* Gson
-* Fastjson
+* Gson 2.8.6
+* Fastjson 1.2.66
+* Elastic-Job 2.1.5
 
 ## 模块说明
 * [retry-cpre](https://github.com/hadoop002/smart-retry/tree/master/retry-core)：重试模块的核心，定义了一系列的接口和扩展点

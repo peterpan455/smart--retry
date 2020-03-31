@@ -1,4 +1,4 @@
-package com.github.smartretry.spring4;
+package com.github.smartretry.spring4.registry.quartz;
 
 /**
  * @author yuni[mn960mn@163.com]

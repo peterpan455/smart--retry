@@ -1,7 +1,7 @@
 package com.github.smartretry.spring4.autoconfigure;
 
-import com.github.smartretry.spring4.EnvironmentConstants;
 import com.github.smartretry.spring4.EnableRetrying;
+import com.github.smartretry.spring4.EnvironmentConstants;
 import org.springframework.aop.config.AopConfigUtils;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.beans.factory.support.RootBeanDefinition;
@@ -46,10 +46,10 @@ public class RetryImportSelector implements EnvironmentAware, ImportBeanDefiniti
     }
 
     private boolean retryEnabled() {
-        return Boolean.parseBoolean(environment.getProperty(EnvironmentConstants.RETRY_ENABLED, "true"));
+        return environment.getProperty(EnvironmentConstants.RETRY_ENABLED, Boolean.class, true);
     }
 
     private boolean retryWebEnabled() {
-        return Boolean.parseBoolean(environment.getProperty(EnvironmentConstants.RETRY_WEB_ENABLED, "true"));
+        return environment.getProperty(EnvironmentConstants.RETRY_WEB_ENABLED, Boolean.class, true);
     }
 }

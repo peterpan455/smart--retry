@@ -1,7 +1,7 @@
 create table SysRetryTask (
 TaskId bigint not null identity,
 IdentityName varchar(50) not null,
-Params nvarchar(4000),
+Params text,
 Status tinyint not null,
 RetryCount int not null default 0,
 Remark nvarchar(1000),

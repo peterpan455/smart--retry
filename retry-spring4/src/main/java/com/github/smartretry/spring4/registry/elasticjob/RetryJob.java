@@ -5,8 +5,8 @@ import com.dangdang.ddframe.job.api.simple.SimpleJob;
 import com.github.smartretry.core.RetryProcessor;
 
 /**
- * @auther liuyang
- * @date 2020年03月27日
+ * @author yuni[mn960mn@163.com]
+ * @since 1.3.5
  */
 public class RetryJob implements SimpleJob {
 
