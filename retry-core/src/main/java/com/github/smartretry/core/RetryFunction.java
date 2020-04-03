@@ -11,9 +11,8 @@ import java.lang.annotation.Target;
  * <p>
  * 打上 RetryFunction 注解的方法，需要注意
  * 1：方法必须要有参数，且只能有一个参数
- * 2：方法可以有返回参数，也可以没有
- * 3：方法的参数不能是Object等无法被JSON序列化和反序列化的类型
- * 4：方法的参数不能是Collection，List等带泛型的类型
+ * 2：方法的参数不能是Object等无法被JSON序列化和反序列化的类型
+ * 3：方法的参数不能是Collection，Map等带泛型的类型
  *
  * @author yuni[mn960mn@163.com]
  */

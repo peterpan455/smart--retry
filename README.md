@@ -8,16 +8,16 @@ Smart Retry主要是用来进行方法重试的。和Guava Retry、Spring Retry�
 ![架构图](https://s1.ax1x.com/2020/03/15/88RvNj.png)
 
 ## 实现原理
-- 系统启动后，把所有com.github.smartretry.core.RetryHandler和带有@RetryFunction注解的方法注册为Quartz Job。
+- 系统启动后，把所有com.github.smartretry.core.RetryHandler和带有@RetryFunction注解的方法注册为定时任务。
 - 所有com.github.smartretry.core.RetryHandler和带有@RetryFunction注解的方法都会被Spring进行代理，执行的时候，会先把参数序列化，然后把执行任务插入到数据库。最后根据任务执行的成功与否，更新任务的相应状态。
-- Quartz Job定时从表里面获取未成功的任务，进行重试
+- 定时任务定时从表里面获取未成功的任务，进行重试
 
 ## 项目特点
 * 方法重试持久化，系统重启之后可以继续重试
 * 异步重试（不支持同步重试）
 * 支持接口实现和声明式方式
 * 大量的扩展点
-* 支持对接其他调度框架（Elastic-Job）
+* 支持对接其他调度框架（如：Elastic-Job）
 * 提供重试Job可视化管理
 
 ## 适用场景
@@ -122,6 +122,7 @@ Smart Retry主要是用来进行方法重试的。和Guava Retry、Spring Retry�
 * [系统参数说明](https://github.com/hadoop002/smart-retry/tree/master/doc/SYS_ARGS.md)
 * [监听器](https://github.com/hadoop002/smart-retry/tree/master/doc/LISTENER.md)
 * [整合Elastic-Job](https://github.com/hadoop002/smart-retry/tree/master/doc/Elastic_Job.md)
+* [常见问题](https://github.com/hadoop002/smart-retry/tree/master/doc/QUESTION.md)
 
 ## 打包
 mvn clean package

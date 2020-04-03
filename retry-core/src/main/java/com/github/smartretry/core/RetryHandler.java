@@ -49,7 +49,7 @@ public interface RetryHandler<T, R> {
      * 任务处理
      *
      * @param arg 参数，参数类型需要满足如下条件
-     *            方法的参数不能是Object等无法被JSON序列化和反序列化的类型、方法的参数不能是Collection，List等带泛型的类型
+     *            方法的参数不能是Object等无法被JSON序列化和反序列化的类型、方法的参数不能是Collection，Map等带泛型的类型
      * @return
      */
     R handle(T arg);

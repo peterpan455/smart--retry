@@ -18,4 +18,4 @@ Smart Retry是一个持久化的任务重试框架，持久化内部使用的是
     
 最后在配置文件中配置retry.sqlMapping.filepath=config/h2.properties
 
-如果要使用其他非关系型数据库，如MongoDB，则可以直接实现一个com.github.smartretry.core.RetryTaskMapper接口，并托管到Spring容器中即可
+如果要使用其他非关系型数据库，如MongoDB，则可以直接实现一个com.github.smartretry.core.RetryTaskMapper接口，并托管到Spring容器中
