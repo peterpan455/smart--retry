@@ -15,6 +15,7 @@
 </dependency>
 ```
 
+* 安装apache zookeeper并启动
 * 在Spring容器中托管如下2个bean
 ```java
 @Bean(initMethod = "init")
