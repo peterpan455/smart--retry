@@ -121,8 +121,8 @@ Smart Retry主要是用来进行方法重试的。和Guava Retry、Spring Retry�
 * [重试方法参数说明](https://github.com/hadoop002/smart-retry/tree/master/doc/TASK_PARAM.md)
 * [系统参数说明](https://github.com/hadoop002/smart-retry/tree/master/doc/SYS_ARGS.md)
 * [监听器](https://github.com/hadoop002/smart-retry/tree/master/doc/LISTENER.md)
-* [整合Elastic-Job](https://github.com/hadoop002/smart-retry/tree/master/doc/Elastic_Job.md)
-* [常见问题](https://github.com/hadoop002/smart-retry/tree/master/doc/QUESTION.md)
+* [整合Elastic-Job](/doc/Elastic_Job.md)
+* [常见问题](/doc/QUESTION.md)
 
 ## 打包
 mvn clean package
