@@ -22,6 +22,8 @@ import javax.sql.DataSource;
  */
 public class RetryAutoConfiguration {
 
+    public static final String POINTCUT_ADVISOR_BEANNAME_PREFIX = "smartRetryPointcutAdvisorMatch";
+
     @Bean
     @RetryConditional(missingBeanType = RetryTaskMapper.class)
     public RetryTaskMapper defaultRetryTaskMapper(BeanFactory beanFactory) {
@@ -46,12 +48,12 @@ public class RetryAutoConfiguration {
         return new RetryAnnotationBeanPostProcessor();
     }
 
-    @Bean
+    @Bean(POINTCUT_ADVISOR_BEANNAME_PREFIX + "Method")
     public DefaultPointcutAdvisor matchMethodPointcutAdvisor() {
         return new DefaultPointcutAdvisor(new RetryHandlerMethodPointcut(), new RetryHandlerMethodInterceptor());
     }
 
-    @Bean
+    @Bean(POINTCUT_ADVISOR_BEANNAME_PREFIX + "Class")
     public DefaultPointcutAdvisor matchClassPointcutAdvisor() {
         return new DefaultPointcutAdvisor(new RetryHandlerClassPointcut(), new RetryHandlerClassInterceptor());
     }
