@@ -16,6 +16,7 @@ Smart Retry主要是用来进行方法重试的。和Guava Retry、Spring Retry�
 * 方法重试持久化，系统重启之后可以继续重试
 * 异步重试（不支持同步重试）
 * 支持接口实现和声明式方式
+* 支持Spring AOP和AspectJ
 * 大量的扩展点
 * 支持对接其他调度框架（如：Elastic-Job）
 * 提供重试Job可视化管理
@@ -53,6 +54,7 @@ Smart Retry主要是用来进行方法重试的。和Guava Retry、Spring Retry�
 ## 模块说明
 * [retry-cpre](https://github.com/hadoop002/smart-retry/tree/master/retry-core)：重试模块的核心，定义了一系列的接口和扩展点
 * [retry-spring4](https://github.com/hadoop002/smart-retry/tree/master/retry-spring4)：基于spring4实现的重试模块
+* [retry-aspects](https://github.com/hadoop002/smart-retry/tree/master/retry-aspects)：支持AspectJ的扩展模块
 * [retry-serializer-jackson2](https://github.com/hadoop002/smart-retry/tree/master/retry-serializer/retry-serializer-jackson2)：使用jackson2来实现参数的序列化和反序列化
 * [retry-serializer-gson](https://github.com/hadoop002/smart-retry/tree/master/retry-serializer/retry-serializer-gson)：使用gson来实现参数的序列化和反序列化
 * [retry-serializer-fastjson](https://github.com/hadoop002/smart-retry/tree/master/retry-serializer/retry-serializer-fastjson)：使用fastjson来实现参数的序列化和反序列化

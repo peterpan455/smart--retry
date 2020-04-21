@@ -1,0 +1,8 @@
+<?xml version="1.0"?>
+<aspectj>
+    <weaver options="-showWeaveInfo"/>
+    <aspects>
+        <aspect name="com.github.smartretry.aspectj.RetryHandlerAnnotationAspect"/>
+        <aspect name="com.github.smartretry.aspectj.RetryHandlerClassAspect"/>
+    </aspects>
+</aspectj>

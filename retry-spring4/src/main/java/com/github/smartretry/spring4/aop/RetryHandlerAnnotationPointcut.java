@@ -13,7 +13,7 @@ import java.lang.reflect.Method;
  *
  * @author yuni[mn960mn@163.com]
  */
-public class RetryHandlerMethodPointcut implements Pointcut {
+public class RetryHandlerAnnotationPointcut implements Pointcut {
 
     @Override
     public ClassFilter getClassFilter() {

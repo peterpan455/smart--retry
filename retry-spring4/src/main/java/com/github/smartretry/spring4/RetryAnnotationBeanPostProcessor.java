@@ -89,7 +89,7 @@ public class RetryAnnotationBeanPostProcessor implements BeanPostProcessor, Smar
 
         Class<?> targetClass = AopProxyUtils.ultimateTargetClass(bean);
         if (!this.postedClasseCache.contains(targetClass)) {
-            Object targetObject = AopProxyUtils.getSingletonTarget(bean);
+            Object targetObject = AopUtils.isAopProxy(bean) ? AopProxyUtils.getSingletonTarget(bean) : bean;
             if (RetryHandler.class.isAssignableFrom(targetClass)) {
                 RetryHandlerUtils.validateRetryHandler(targetClass);
                 log.info("发现RetryHandler的实例：{}，准备注册", targetClass);

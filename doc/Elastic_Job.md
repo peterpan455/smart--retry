@@ -18,7 +18,7 @@
 * 安装apache zookeeper并启动
 * 在Spring容器中托管如下2个bean
 ```java
-@Bean(initMethod = "init")
+@Bean(initMethod = "init", destroyMethod = "close")
 public CoordinatorRegistryCenter coordinatorRegistryCenter() {
     return new ZookeeperRegistryCenter(new ZookeeperConfiguration("192.168.1.100:2181", "orderNamespace"));
 }

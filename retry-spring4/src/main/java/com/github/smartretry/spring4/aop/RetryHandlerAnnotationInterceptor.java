@@ -14,7 +14,7 @@ import java.util.Optional;
 /**
  * @author yuni[mn960mn@163.com]
  */
-public class RetryHandlerMethodInterceptor implements MethodInterceptor {
+public class RetryHandlerAnnotationInterceptor implements MethodInterceptor {
 
     @Override
     public Object invoke(MethodInvocation invocation) {

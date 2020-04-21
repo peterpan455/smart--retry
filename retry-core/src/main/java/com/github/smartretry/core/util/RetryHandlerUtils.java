@@ -46,7 +46,7 @@ public class RetryHandlerUtils {
         }
         if (Object.class.equals(argsInputType)) {
             throw new IllegalRetryException("重试方法的参数类型[" + argsInputType + "]不能是Object或其他不能序列化和反序列化的类型");
-        } else if (Collection.class.isAssignableFrom(argsInputType) || Map.class.isAssignableFrom(argsInputType)) {
+        } else if (Iterable.class.isAssignableFrom(argsInputType) || Map.class.isAssignableFrom(argsInputType)) {
             throw new IllegalRetryException("重试方法的参数类型[" + argsInputType + "]不能是集合类等带泛型的");
         }
     }
@@ -58,7 +58,7 @@ public class RetryHandlerUtils {
         Class<?> clazz = method.getParameterTypes()[0];
         if (Object.class.equals(clazz)) {
             throw new IllegalRetryException(method.toString() + ": 重试方法的参数类型不能是Object或其他不能序列化和反序列化的类型");
-        } else if (Collection.class.isAssignableFrom(clazz) || Map.class.isAssignableFrom(clazz)) {
+        } else if (Iterable.class.isAssignableFrom(clazz) || Map.class.isAssignableFrom(clazz)) {
             throw new IllegalRetryException(method.toString() + ": 重试方法的参数类型不能是集合类等带泛型的");
         }
     }
