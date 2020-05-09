@@ -25,7 +25,7 @@ public class RetryAdvisorAutoProxyCreator extends AbstractAdvisorAutoProxyCreato
      * @return
      */
     @Override
-    public List<Advisor> findCandidateAdvisors() {
+    protected List<Advisor> findCandidateAdvisors() {
         return retryAdvisors;
     }
 }

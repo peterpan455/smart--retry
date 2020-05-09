@@ -115,6 +115,8 @@ public class RetryAnnotationBeanPostProcessor implements BeanPostProcessor, Smar
     private RetrySerializer getRetrySerializerFromBeanFactory(BeanFactory beanFactory) {
         try {
             return beanFactory.getBean(RetrySerializer.class);
+        } catch (NoUniqueBeanDefinitionException e) {
+            throw e;
         } catch (NoSuchBeanDefinitionException e) {
             return null;
         }
@@ -136,6 +138,8 @@ public class RetryAnnotationBeanPostProcessor implements BeanPostProcessor, Smar
         }
 
         retryHandlers.forEach(this::registerJobBean);
+
+        retryHandlers.clear();
     }
 
     protected void registerJobBean(RetryHandler retryHandler) {
