@@ -22,7 +22,9 @@ import org.springframework.core.env.Environment;
 import org.springframework.util.ReflectionUtils;
 
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.function.Supplier;
 
@@ -32,7 +34,7 @@ import java.util.function.Supplier;
  * @author yuni[mn960mn@163.com]
  */
 @Slf4j
-public class RetryAnnotationBeanPostProcessor implements BeanPostProcessor, SmartInitializingSingleton, EnvironmentAware, InitializingBean, BeanFactoryAware {
+public class RetryAnnotationBeanPostProcessor implements BeanPostProcessor, SmartInitializingSingleton, EnvironmentAware, BeanFactoryAware {
 
     private DefaultListableBeanFactory defaultListableBeanFactory;
 
@@ -43,6 +45,8 @@ public class RetryAnnotationBeanPostProcessor implements BeanPostProcessor, Smar
      */
     private Set<Class<?>> postedClasseCache = new HashSet<>();
 
+    private List<RetryHandler> retryHandlers = new ArrayList<>();
+
     private RetryRegistry retryRegistry;
 
     private RetrySerializer retrySerializer;
@@ -52,27 +56,13 @@ public class RetryAnnotationBeanPostProcessor implements BeanPostProcessor, Smar
     private RetryHandlerPostProcessor<Object, Object> retryHandlerPostProcessor;
 
     @Override
-    public void setBeanFactory(BeanFactory beanFactory) throws BeansException {
-        defaultListableBeanFactory = (DefaultListableBeanFactory) beanFactory;
-    }
-
-    @Override
     public void setEnvironment(Environment environment) {
         this.environment = environment;
     }
 
     @Override
-    public void afterPropertiesSet() {
-        this.retryTaskMapper = defaultListableBeanFactory.getBean(RetryTaskMapper.class);
-        this.retryRegistry = defaultListableBeanFactory.getBean(RetryRegistry.class);
-
-        boolean beforeTask = environment.getProperty(EnvironmentConstants.RETRY_BEFORETASK, Boolean.class, Boolean.TRUE);
-        this.retrySerializer = getRetrySerializerFromBeanFactory(defaultListableBeanFactory);
-        if (this.retrySerializer == null) {
-            this.retryHandlerPostProcessor = new DefaultRetryHandlerPostProcessor(retryTaskMapper, beforeTask);
-        } else {
-            this.retryHandlerPostProcessor = new DefaultRetryHandlerPostProcessor(new DefaultRetryTaskFactory(retrySerializer), retryTaskMapper, beforeTask);
-        }
+    public void setBeanFactory(BeanFactory beanFactory) throws BeansException {
+        defaultListableBeanFactory = (DefaultListableBeanFactory) beanFactory;
     }
 
     @Override
@@ -93,7 +83,7 @@ public class RetryAnnotationBeanPostProcessor implements BeanPostProcessor, Smar
             if (RetryHandler.class.isAssignableFrom(targetClass)) {
                 RetryHandlerUtils.validateRetryHandler(targetClass);
                 log.info("发现RetryHandler的实例：{}，准备注册", targetClass);
-                registerJobBean((RetryHandler) targetObject);
+                retryHandlers.add((RetryHandler) targetObject);
                 return bean;
             }
             ReflectionUtils.MethodFilter methodFilter = method -> method.getAnnotation(RetryFunction.class) != null;
@@ -119,7 +109,7 @@ public class RetryAnnotationBeanPostProcessor implements BeanPostProcessor, Smar
             }
             return retryListener;
         };
-        registerJobBean(new MethodRetryHandler(bean, invocableMethod, retryFunction, retryListenerSupplier));
+        retryHandlers.add(new MethodRetryHandler(bean, invocableMethod, retryFunction, retryListenerSupplier));
     }
 
     private RetrySerializer getRetrySerializerFromBeanFactory(BeanFactory beanFactory) {
@@ -128,6 +118,24 @@ public class RetryAnnotationBeanPostProcessor implements BeanPostProcessor, Smar
         } catch (NoSuchBeanDefinitionException e) {
             return null;
         }
+    }
+
+    @Override
+    public void afterSingletonsInstantiated() {
+        postedClasseCache.clear();
+
+        this.retryTaskMapper = defaultListableBeanFactory.getBean(RetryTaskMapper.class);
+        this.retryRegistry = defaultListableBeanFactory.getBean(RetryRegistry.class);
+
+        boolean beforeTask = environment.getProperty(EnvironmentConstants.RETRY_BEFORETASK, Boolean.class, Boolean.TRUE);
+        this.retrySerializer = getRetrySerializerFromBeanFactory(defaultListableBeanFactory);
+        if (this.retrySerializer == null) {
+            this.retryHandlerPostProcessor = new DefaultRetryHandlerPostProcessor(retryTaskMapper, beforeTask);
+        } else {
+            this.retryHandlerPostProcessor = new DefaultRetryHandlerPostProcessor(new DefaultRetryTaskFactory(retrySerializer), retryTaskMapper, beforeTask);
+        }
+
+        retryHandlers.forEach(this::registerJobBean);
     }
 
     protected void registerJobBean(RetryHandler retryHandler) {
@@ -141,10 +149,5 @@ public class RetryAnnotationBeanPostProcessor implements BeanPostProcessor, Smar
         RetryProcessor retryProcessor = new DefaultRetryProcessor(retryHandler, retryTaskMapper, retrySerializer);
 
         retryRegistry.register(retryHandler, retryProcessor);
-    }
-
-    @Override
-    public void afterSingletonsInstantiated() {
-        postedClasseCache.clear();
     }
 }
