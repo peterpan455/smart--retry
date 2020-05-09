@@ -2,8 +2,13 @@ package com.github.smartretry.spring4.autoconfigure;
 
 import com.github.smartretry.spring4.EnableRetrying;
 import com.github.smartretry.spring4.EnvironmentConstants;
-import org.springframework.aop.config.AopConfigUtils;
-import org.springframework.aop.framework.autoproxy.DefaultAdvisorAutoProxyCreator;
+import com.github.smartretry.spring4.aop.RetryAdvisorAutoProxyCreator;
+import com.github.smartretry.spring4.aop.RetryHandlerClassInterceptor;
+import com.github.smartretry.spring4.aop.RetryHandlerClassPointcut;
+import com.github.smartretry.spring4.aop.RetryHandlerMethodInterceptor;
+import com.github.smartretry.spring4.aop.RetryHandlerMethodPointcut;
+import org.springframework.aop.Advisor;
+import org.springframework.aop.support.DefaultPointcutAdvisor;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.beans.factory.support.RootBeanDefinition;
@@ -11,8 +16,9 @@ import org.springframework.context.EnvironmentAware;
 import org.springframework.context.annotation.ImportBeanDefinitionRegistrar;
 import org.springframework.core.env.Environment;
 import org.springframework.core.type.AnnotationMetadata;
-import org.springframework.util.ClassUtils;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -43,43 +49,25 @@ public class RetryImportSelector implements EnvironmentAware, ImportBeanDefiniti
     }
 
     protected void registerProxyCreator(AnnotationMetadata importingClassMetadata, BeanDefinitionRegistry registry) {
-        if (isRegisterProxyCreator()) {
-            Map<String, Object> annotationData = importingClassMetadata.getAnnotationAttributes(EnableRetrying.class.getName());
-            boolean proxyTargetClass = (Boolean) annotationData.get("proxyTargetClass");
-            boolean exposeProxy = (Boolean) annotationData.get("exposeProxy");
-
-            if (isSpringBoot() && springBootAopAuto()) {
-                if (proxyTargetClass) {
-                    AopConfigUtils.forceAutoProxyCreatorToUseClassProxying(registry);
-                }
-                if (exposeProxy) {
-                    AopConfigUtils.forceAutoProxyCreatorToExposeProxy(registry);
-                }
-            } else {
-                Integer order = (Integer) annotationData.get("order");
-                registerAdvisorAutoProxyCreator(registry, proxyTargetClass, exposeProxy, order);
-            }
-        }
+        Map<String, Object> annotationData = importingClassMetadata.getAnnotationAttributes(EnableRetrying.class.getName());
+        boolean proxyTargetClass = (Boolean) annotationData.get("proxyTargetClass");
+        boolean exposeProxy = (Boolean) annotationData.get("exposeProxy");
+        Integer order = (Integer) annotationData.get("order");
+        registerAdvisorAutoProxyCreator(registry, proxyTargetClass, exposeProxy, order);
     }
 
     protected void registerAdvisorAutoProxyCreator(BeanDefinitionRegistry registry, boolean proxyTargetClass, boolean exposeProxy, Integer order) {
-        BeanDefinitionBuilder beanDefinitionBuilder = BeanDefinitionBuilder.rootBeanDefinition(DefaultAdvisorAutoProxyCreator.class);
+        List<Advisor> retryAdvisors = new ArrayList<>();
+        retryAdvisors.add(new DefaultPointcutAdvisor(new RetryHandlerMethodPointcut(), new RetryHandlerMethodInterceptor()));
+        retryAdvisors.add(new DefaultPointcutAdvisor(new RetryHandlerClassPointcut(), new RetryHandlerClassInterceptor()));
+
+        BeanDefinitionBuilder beanDefinitionBuilder = BeanDefinitionBuilder.rootBeanDefinition(RetryAdvisorAutoProxyCreator.class);
         beanDefinitionBuilder.addPropertyValue("proxyTargetClass", proxyTargetClass);
         beanDefinitionBuilder.addPropertyValue("exposeProxy", exposeProxy);
         beanDefinitionBuilder.addPropertyValue("order", order);
-        beanDefinitionBuilder.addPropertyValue("usePrefix", true);
-        beanDefinitionBuilder.addPropertyValue("advisorBeanNamePrefix", RetryAutoConfiguration.POINTCUT_ADVISOR_BEANNAME_PREFIX);
+        beanDefinitionBuilder.addPropertyValue("retryAdvisors", retryAdvisors);
+
         registry.registerBeanDefinition("smartRetryAdvisorAutoProxyCreator", beanDefinitionBuilder.getBeanDefinition());
-    }
-
-    protected boolean isSpringBoot() {
-        ClassLoader classLoader = getClass().getClassLoader();
-        return ClassUtils.isPresent("org.springframework.boot.SpringApplication", classLoader)
-                && ClassUtils.isPresent("org.springframework.boot.autoconfigure.SpringBootApplication", classLoader);
-    }
-
-    protected boolean springBootAopAuto() {
-        return environment.getProperty("spring.aop.auto", Boolean.class, true);
     }
 
     protected boolean retryEnabled() {
@@ -88,9 +76,5 @@ public class RetryImportSelector implements EnvironmentAware, ImportBeanDefiniti
 
     protected boolean retryWebEnabled() {
         return environment.getProperty(EnvironmentConstants.RETRY_WEB_ENABLED, Boolean.class, true);
-    }
-
-    protected boolean isRegisterProxyCreator() {
-        return environment.getProperty(EnvironmentConstants.RETRY_REGISTER_PROXYCREATOR, Boolean.class, true);
     }
 }

@@ -5,13 +5,8 @@ import com.github.smartretry.core.RetryTaskMapper;
 import com.github.smartretry.spring4.BeanConstants;
 import com.github.smartretry.spring4.JdbcRetryTaskMapper;
 import com.github.smartretry.spring4.RetryAnnotationBeanPostProcessor;
-import com.github.smartretry.spring4.aop.RetryHandlerClassInterceptor;
-import com.github.smartretry.spring4.aop.RetryHandlerClassPointcut;
-import com.github.smartretry.spring4.aop.RetryHandlerMethodInterceptor;
-import com.github.smartretry.spring4.aop.RetryHandlerMethodPointcut;
 import com.github.smartretry.spring4.registry.quartz.QuartzRetryRegistry;
 import com.github.smartretry.spring4.support.RetryConditional;
-import org.springframework.aop.support.DefaultPointcutAdvisor;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.context.annotation.Bean;
 
@@ -21,8 +16,6 @@ import javax.sql.DataSource;
  * @author yuni[mn960mn@163.com]
  */
 public class RetryAutoConfiguration {
-
-    public static final String POINTCUT_ADVISOR_BEANNAME_PREFIX = "smartRetryPointcutAdvisorMatch";
 
     @Bean
     @RetryConditional(missingBeanType = RetryTaskMapper.class)
@@ -46,15 +39,5 @@ public class RetryAutoConfiguration {
     @Bean
     public RetryAnnotationBeanPostProcessor retryAnnotationBeanPostProcessor() {
         return new RetryAnnotationBeanPostProcessor();
-    }
-
-    @Bean(POINTCUT_ADVISOR_BEANNAME_PREFIX + "Method")
-    public DefaultPointcutAdvisor matchMethodPointcutAdvisor() {
-        return new DefaultPointcutAdvisor(new RetryHandlerMethodPointcut(), new RetryHandlerMethodInterceptor());
-    }
-
-    @Bean(POINTCUT_ADVISOR_BEANNAME_PREFIX + "Class")
-    public DefaultPointcutAdvisor matchClassPointcutAdvisor() {
-        return new DefaultPointcutAdvisor(new RetryHandlerClassPointcut(), new RetryHandlerClassInterceptor());
     }
 }

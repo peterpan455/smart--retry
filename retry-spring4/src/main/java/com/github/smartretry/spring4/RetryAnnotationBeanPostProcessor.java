@@ -39,7 +39,7 @@ public class RetryAnnotationBeanPostProcessor implements BeanPostProcessor, Smar
     private Environment environment;
 
     /**
-     * 同一个类，如何在Spring容器中有多个，则会PostProcessor多次，这个Set就是为了防止多次注册的
+     * 同一个类，如果在Spring容器中有多个bean，则会PostProcessor多次，这个Set就是为了防止多次注册的
      */
     private Set<Class<?>> postedClasseCache = new HashSet<>();
 
